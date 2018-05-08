@@ -1,0 +1,26 @@
+{
+  "name": "plant_neuralnetwork",
+  "version": "1.0.0",
+  "description": "treinando para ligar ou desligar uma valvula solenoide para agoar a planta",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danielaraujorn/plant_neuralNetwork.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/danielaraujorn/plant_neuralNetwork/issues"
+  },
+  "homepage": "https://github.com/danielaraujorn/plant_neuralNetwork#readme",
+  "dependencies": {
+    "express": "^4.16.3",
+    "socket.io": "^2.1.0",
+    "synaptic": "^1.1.4",
+    "thinky": "^2.3.9",
+    "uuid": "^3.2.1"
+  }
+}

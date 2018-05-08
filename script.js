@@ -91,16 +91,25 @@ var trainingSet = [
 ];
 
 myTrainer.train(trainingSet, {
-  rate: 0.05,
+  rate: 0.1,
   iterations: 10000,
   error: 0.01,
   shuffle: true,
-  log: 500,
   cost: Trainer.cost.CROSS_ENTROPY
 });
 
-function predict(array) {
-  console.log("input:", array, "\noutput:", myPerceptron.activate(array));
+function predict(hora, umidade) {
+  console.log(
+    `${hora}h, umidade: ${(getValue(umidade, 1024) * 100).toFixed(
+      2
+    )}%, conclusão: ${
+      Math.round(
+        myPerceptron.activate([getValue(hora, 24), getValue(umidade, 1024)])
+      )
+        ? "ligar"
+        : "desligar"
+    } motor`
+  );
 }
-predict([getValue(16, 24), getValue(700, 1024)]);
-predict([getValue(15, 24), getValue(1000, 1024)]);
+predict(16, 600);
+predict(15, 400);
