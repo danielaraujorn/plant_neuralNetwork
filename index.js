@@ -2,25 +2,7 @@ var app = require("express")();
 var http = require("http").Server(app);
 var io = require("socket.io")(http);
 var { Layer, Network, Trainer } = require("synaptic");
-var Blob = require("blob");
-function MLP(input, hidden, output) {
-  // create the layers
-  var inputLayer = new Layer(input);
-  var hiddenLayer = new Layer(hidden);
-  var outputLayer = new Layer(output);
-
-  // connect the layers
-  inputLayer.project(hiddenLayer);
-  hiddenLayer.project(outputLayer);
-
-  // set the layers
-  return {
-    input: inputLayer,
-    hidden: [hiddenLayer],
-    output: outputLayer
-  };
-}
-
+var NeuralNetwork = require("./nn");
 var thinky = require("thinky")({
   db: "plant_dataset",
   host: "localhost",
@@ -35,15 +17,12 @@ var Dataset = thinky.createModel("dataset", {
 function getValue(analog, d) {
   return analog / d;
 }
-var myNet = new Network(MLP(2, 10, 1));
+var myNet = new NeuralNetwork(MLP(2, 6, 1));
 var myTrainer = new Trainer(myNet);
 Dataset.run().then(myDataset =>
   myTrainer.train(trainingSet, {
-    rate: 0.1,
-    iterations: 10000,
-    error: 0.01,
-    shuffle: true,
-    cost: Trainer.cost.CROSS_ENTROPY
+    learningRate: 0.1,
+    iterations: 10000
   })
 );
 
@@ -80,7 +59,7 @@ var lastData = {
 // }, 400);
 
 const predict = (umidade, luminosidade) =>
-  myNet.activate([umidade, luminosidade]);
+  myNet.predict([umidade, luminosidade]);
 
 var trainingSet = [
   {
