@@ -137,3 +137,5 @@ class Matrix {
 if (typeof module !== "undefined") {
   module.exports = Matrix;
 }
+
+module.exports = Matrix;

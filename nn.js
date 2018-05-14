@@ -1,3 +1,4 @@
+var Matrix = require("./matrix");
 class ActivationFunction {
   constructor(func, dfunc) {
     this.func = func;

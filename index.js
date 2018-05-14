@@ -1,8 +1,9 @@
 var app = require("express")();
 var http = require("http").Server(app);
 var io = require("socket.io")(http);
-var { Layer, Network, Trainer } = require("synaptic");
+// var { Layer, Network, Trainer } = require("synaptic");
 var NeuralNetwork = require("./nn");
+var Trainer = require("./trainer");
 var thinky = require("thinky")({
   db: "plant_dataset",
   host: "localhost",
@@ -17,27 +18,30 @@ var Dataset = thinky.createModel("dataset", {
 function getValue(analog, d) {
   return analog / d;
 }
-var myNet = new NeuralNetwork(MLP(2, 6, 1));
+var myNet = new NeuralNetwork(2, 6, 1);
 var myTrainer = new Trainer(myNet);
-Dataset.run().then(myDataset =>
-  myTrainer.train(trainingSet, {
-    learningRate: 0.1,
-    iterations: 10000
-  })
-);
+// const xorDS = [
+//   { input: [1, 1], output: [0] },
+//   { input: [1, 0], output: [1] },
+//   { input: [0, 1], output: [1] },
+//   { input: [0, 0], output: [0] }
+// ];
+Dataset.run().then(myDataset => myTrainer.train(myDataset));
 
 io.on("connection", function(socket) {
   socket.on("sendsensor", data => {
     lastData[data.serial] = data.value;
     let saida = predict(lastData.umd, lastData.luz);
+    saida =
+      saida > 0.8
+        ? socket.emit("returnvalue", 1)
+        : saida < 0.2 && socket.emit("returnvalue", 0);
     console.log(data, `saindo: ${saida}`);
-    saida > 0.9
-      ? socket.emit("returnvalue", 1)
-      : saida < 0.1 && socket.emit("returnvalue", 0);
+    lastData.bmb = saida;
   });
   socket.on("getvalue", data => {
     console.log("get value", data);
-    socket.emit("returnvalue", 1);
+    socket.emit("returnvalue", lastData.bmb);
   });
   console.log("a user is connected");
 });
@@ -46,68 +50,88 @@ http.listen(port, function() {
   console.log("listening on *:" + port);
 });
 var lastData = {
-  luz: 0.2,
+  luz: 0.7,
   umd: 0,
   bmb: 0
 };
+const intervalo = () =>
+  setInterval(() => {
+    if (lastData.umd > 1) lastData.umd = 0;
+    else lastData.umd += 0.05;
 
-// setInterval(() => {
-//   if (lastData.umd > 1) lastData.umd = 0;
-//   else lastData.umd += 0.05;
-
-//   predict(lastData.umd, lastData.luz);
-// }, 400);
+    console.log(
+      lastData.umd,
+      lastData.luz,
+      predict(lastData.umd, lastData.luz)
+    );
+  }, 400);
 
 const predict = (umidade, luminosidade) =>
   myNet.predict([umidade, luminosidade]);
 
 var trainingSet = [
   {
-    input: [0, 200 / 1023],
+    input: [0, 0.7],
     output: [0]
   },
   {
-    input: [0.1, 200 / 1023],
+    input: [0.1, 0.4],
     output: [0]
   },
   {
-    input: [0.2, 200 / 1023],
+    input: [0.2, 0.8],
     output: [0]
   },
   {
-    input: [0.3, 200 / 1023],
+    input: [0.3, 0.74],
     output: [0.5]
   },
   {
-    input: [0.35, 200 / 1023],
+    input: [0.35, 0.7],
     output: [0.5]
   },
   {
-    input: [0.4, 200 / 1023],
+    input: [0.4, 0.7],
     output: [1]
   },
   {
-    input: [0.5, 200 / 1023],
+    input: [0.5, 0.7],
     output: [1]
   },
   {
-    input: [0.6, 200 / 1023],
+    input: [0.6, 0.7],
     output: [1]
   },
   {
-    input: [0.7, 200 / 1023],
+    input: [0.7, 0.7],
     output: [1]
   },
   {
-    input: [0.8, 200 / 1023],
+    input: [0.8, 0.7],
     output: [1]
   },
   {
-    input: [0.9, 200 / 1023],
+    input: [0.9, 0.7],
     output: [1]
   },
   {
-    input: [1, 200 / 1023],
+    input: [1, 0.7],
+    output: [1]
+  },
+  {
+    input: [0.8, 0.85],
+    output: [0]
+  },
+  {
+    input: [0.3, 0.85],
+    output: [0]
+  },
+  {
+    input: [0.8, 0.2],
+    output: [0]
+  },
+  {
+    input: [0.8, 0.6],
     output: [1]
   }
 ];
