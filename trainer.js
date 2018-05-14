@@ -4,7 +4,7 @@ class Trainer {
     this.nn = nn;
   }
   train(dataset, iterations = 10000, learningRate = 0.05) {
-    console.log(dataset);
+    // console.log(dataset);
     return new Promise(resolve => {
       this.nn.setLearningRate(learningRate);
       for (let i = 0; i < iterations; i++) {

@@ -32,15 +32,13 @@ io.on("connection", function(socket) {
   socket.on("sendsensor", data => {
     lastData[data.serial] = data.value;
     let saida = predict(lastData.umd, lastData.luz);
-    saida =
-      saida > 0.8
-        ? socket.emit("returnvalue", 1)
-        : saida < 0.2 && socket.emit("returnvalue", 0);
+    saida > 0.8 ? (saida = 1) : saida < 0.2 && (saida = 0);
+    io.emit("returnvalue", saida);
     console.log(data, `saindo: ${saida}`);
     lastData.bmb = saida;
   });
   socket.on("getvalue", data => {
-    console.log("get value", data);
+    console.log("retornando", lastData.bmb);
     socket.emit("returnvalue", lastData.bmb);
   });
   console.log("a user is connected");
@@ -52,7 +50,7 @@ http.listen(port, function() {
 var lastData = {
   luz: 0.7,
   umd: 0,
-  bmb: 0
+  bmb: 1
 };
 const intervalo = () =>
   setInterval(() => {
