@@ -34,14 +34,15 @@ io.on("connection", function(socket) {
     let saida = predict(lastData.umd, lastData.luz);
     saida > 0.8 ? (saida = 1) : saida < 0.2 && (saida = 0);
     io.emit("returnvalue", saida);
-    console.log(data, `saindo: ${saida}`);
+    if (saida !== lastData.bmb) console.log("novo estado:" + saida, new Date());
+    // console.log(data, `saindo: ${saida}`);
     lastData.bmb = saida;
   });
   socket.on("getvalue", data => {
-    console.log("retornando", lastData.bmb);
+    // console.log("retornando", lastData.bmb);
     socket.emit("returnvalue", lastData.bmb);
   });
-  console.log("a user is connected");
+  // console.log("a user is connected");
 });
 var port = process.env.PORT || 3001;
 http.listen(port, function() {
